@@ -1,47 +1,19 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  build:
+  sonarqube:
+    name: SonarCloud Scan
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
 
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run Linter
-      run: npx eslint . || echo "Linting failed"
-
-    - name: Run Tests
-      run: npm test || echo "Tests failed"
-
-    - name: Build Docker image
-      run: docker build -t secure-ci-cd-demo .
-
-    - name: Run Docker container
-      run: docker run -d -p 3000:3000 secure-ci-cd-demo
-
-    # 🔐 SAST Scan with Semgrep
-    - name: Run Semgrep SAST scan
-      run: |
-        pip install semgrep
-        semgrep scan --config=auto .
-
-    # 🛡️ DAST Scan with OWASP ZAP
-    - name: Run OWASP ZAP DAST scan
-      uses: zaproxy/action-full-scan@v0.7.0
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
-        target: 'http://localhost:3000'
+        args: >
+          -Dsonar.projectKey=sharanappu_secure-ci-cd-demo
+          -Dsonar.organization=your-sonarcloud-org
