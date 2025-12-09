@@ -30,3 +30,6 @@ jobs:
 
     - name: Build Docker image
       run: docker build -t secure-ci-cd-demo .
+
+    - name: Run Docker container
+      run: docker run -d -p 3000:3000 secure-ci-cd-demo
